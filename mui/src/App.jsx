@@ -1,33 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import {Checkbox, List, ListItem, ListItemIcon, ListItemText, TextField, Typography} from '@mui/material'
 import './App.css'
+import { useEffect, useState } from 'react'
 
-function App() {
-  const [count, setCount] = useState(0)
+function App() { 
+  const [todos, setTodos] = useState([])
 
+  function updateTodo(index){
+    const currentTodos = [...todos]
+    currentTodos[index].completed = !currentTodos[index].completed
+    setTodos(currentTodos)
+  }
+  // use useEffect to update the component so the page get refreshed
+  useEffect(() => {
+    document.addEventListener("keydown", function(Event){
+      if(Event.key === "Enter"){
+        let todotext = document.getElementById("newtodo").value
+        if(todotext){
+          setTodos([...todos, {title: todotext, completed: false}])
+          //document.getElementById("newtodo").value = ""
+        }
+      }
+    })
+  }, [todos])
+  console.log(todos)
   return (
+    
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    {/* TODOS */}
+    {/* variant: assigns the style
+        component: assigns the html-tag
+        [-] in this we have  */}
+    <Typography variant="h2" component="h1">To Do</Typography>
+    <TextField id="newtodo" variant='outlined' label="Ny todo-oppgave"/>
+    <List>
+      {todos.map((todo, index) =>(
+        todo.completed === false ?
+        <ListItem key={index}>
+        <ListItemIcon>
+          <Checkbox checked={todo.completed} onChange={() => {updateTodo(index)}}/>
+        </ListItemIcon>
+        <ListItemText primary={todo.title}/>
+      </ListItem> : null
+        ))}
+    </List>
+    {/* COMPLETED TODOS */}
+    <Typography variant="h3" component="h2">Completed</Typography>
+    <List>
+      {todos.map((todo, index) =>(
+        todo.completed === true ?
+        <ListItem key={index}>
+        <ListItemIcon>
+          <Checkbox checked={todo.completed} onChange={() => {updateTodo(index)}}/>
+        </ListItemIcon>
+        {/* sx-protperty allows you to send css style to the component and make custom changes on the component */}
+        <ListItemText sx={{textDecoration: "line-through"}} primary={todo.title}/>
+      </ListItem> : null
+        ))}
+    </List>
     </>
   )
 }
